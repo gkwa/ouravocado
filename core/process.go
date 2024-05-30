@@ -1,15 +1,11 @@
 package core
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/taylormonacelli/somespider"
@@ -19,14 +15,6 @@ var cacheRelativePath string
 
 func init() {
 	cacheRelativePath = filepath.Join("ouravocado", "index.json")
-}
-
-type FileInfo struct {
-	Path         string `json:"path"`
-	WordCount    int    `json:"wordCount"`
-	Size         int64  `json:"size"`
-	SizeFriendly string `json:"sizeFriendly"`
-	FastChecksum string `json:"fastChecksum"`
 }
 
 func ProcessDirectories(dirs []string, verbose bool, ignorePaths []string) error {
@@ -94,27 +82,6 @@ func filterByExtensions(paths []string, includeExtensions []string) []string {
 		}
 	}
 	return filteredPaths
-}
-
-func loadCacheFromFile(checksumCache map[string]FileInfo) {
-	data, err := os.ReadFile("index.json")
-	if err != nil {
-		if !os.IsNotExist(err) {
-			slog.Error("error reading index.json", "error", err)
-		}
-		return
-	}
-
-	var fileInfos []FileInfo
-	err = json.Unmarshal(data, &fileInfos)
-	if err != nil {
-		slog.Error("error unmarshaling index.json", "error", err)
-		return
-	}
-
-	for _, fileInfo := range fileInfos {
-		checksumCache[fileInfo.Path] = fileInfo
-	}
 }
 
 func scanDirectory(dir string) ([]string, error) {
@@ -199,57 +166,4 @@ func generateFileInfo(path string, checksumCache map[string]FileInfo) (FileInfo,
 	checksumCache[path] = fileInfo
 
 	return fileInfo, nil
-}
-
-func calculateChecksum(path string) (string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-	checksum := hex.EncodeToString(hash.Sum(nil))
-
-	return checksum, nil
-}
-
-func countWords(path string) (int, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
-
-	var wordCount int
-	data := make([]byte, 1024)
-	for {
-		count, err := file.Read(data)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return 0, err
-		}
-
-		words := strings.Fields(string(data[:count]))
-		wordCount += len(words)
-	}
-
-	return wordCount, nil
-}
-
-func formatSize(size int64) string {
-	units := []string{"B", "KB", "MB", "GB", "TB"}
-
-	var i int
-	fsize := float64(size)
-	for i = 0; fsize >= 1024 && i < len(units)-1; i++ {
-		fsize /= 1024
-	}
-
-	return strconv.FormatFloat(fsize, 'f', 2, 64) + " " + units[i]
 }
