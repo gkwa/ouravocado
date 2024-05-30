@@ -7,10 +7,10 @@ import (
 )
 
 func loadCacheFromFile(checksumCache map[string]FileInfo) {
-	data, err := os.ReadFile("index.json")
+	data, err := os.ReadFile(index)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			slog.Error("error reading index.json", "error", err)
+			slog.Error("error reading cache", "path", index, "error", err)
 		}
 		return
 	}
@@ -18,7 +18,7 @@ func loadCacheFromFile(checksumCache map[string]FileInfo) {
 	var fileInfos []FileInfo
 	err = json.Unmarshal(data, &fileInfos)
 	if err != nil {
-		slog.Error("error unmarshaling index.json", "error", err)
+		slog.Error("error unmarshaling cache", "path", index, "error", err)
 		return
 	}
 

@@ -11,10 +11,18 @@ import (
 	"github.com/taylormonacelli/somespider"
 )
 
-var cacheRelativePath string
+var (
+	cacheRelativePath string
+	index             string
+)
 
 func init() {
 	cacheRelativePath = filepath.Join("ouravocado", "index.json")
+	var err error
+	index, err = somespider.GenPath(cacheRelativePath)
+	if err != nil {
+		slog.Error("generating cache path failed", "error", err)
+	}
 }
 
 func ProcessDirectories(dirs []string, verbose bool, ignorePaths []string) error {
