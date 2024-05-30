@@ -12,7 +12,6 @@ import (
 
 var (
 	cfgFile   string
-	verbose   bool
 	logFormat string
 )
 
@@ -52,12 +51,6 @@ func init() {
 	var err error
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ouravocado.yaml)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose mode")
-	err = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	if err != nil {
-		slog.Error("error binding verbose flag", "error", err)
-		os.Exit(1)
-	}
 
 	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "json or text (default is text)")
 	err = viper.BindPFlag("log-format", rootCmd.PersistentFlags().Lookup("log-format"))
