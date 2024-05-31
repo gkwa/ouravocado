@@ -29,7 +29,7 @@ func ProcessDirectories(dirs []string, verbose bool, ignorePaths []string, inclu
 	}
 
 	filePaths = file.FilterOutIgnoredPaths(filePaths, ignorePaths)
-	filePaths = file.FilterByExtensions(filePaths, includeExtensions)
+	filePaths = file.FilterByExtensions(filePaths, includeExtensions...)
 
 	fileInfos, err := generateFileInfos(filePaths, checksumCache)
 	if err != nil {

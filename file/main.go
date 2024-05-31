@@ -53,7 +53,7 @@ func FilterOutIgnoredPaths(paths []string, ignorePaths []string) []string {
 	return filteredPaths
 }
 
-func FilterByExtensions(paths []string, includeExtensions []string) []string {
+func FilterByExtensions(paths []string, includeExtensions ...string) []string {
 	extMap := make(map[string]bool)
 	for _, ext := range includeExtensions {
 		extMap["."+strings.TrimLeft(strings.ToLower(ext), ".")] = true
