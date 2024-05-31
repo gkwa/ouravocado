@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func loadCacheFromFile(checksumCache map[string]FileInfo) {
+func loadCacheFromFile(checksumCache map[string]FileInfo, index string) {
 	data, err := os.ReadFile(index)
 	if err != nil {
 		if !os.IsNotExist(err) {
